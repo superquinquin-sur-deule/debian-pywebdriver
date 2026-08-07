@@ -1,0 +1,36 @@
+Source: pywebdriver
+Section: python
+Priority: extra
+Maintainer: Florent Jardin <florent@jardin.im>
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-setuptools
+Standards-Version: 4.6.2
+
+Package: pywebdriver
+Architecture: all
+Depends: ${python3:Depends},
+         ${misc:Depends},
+         python3-barcode,
+         python3-cups,
+         python3-flask,
+         python3-flask-babel,
+         python3-flask-cors,
+         python3-gevent,
+         python3-importlib-resources,
+         python3-netifaces,
+         python3-pil,
+         python3-pycountry,
+         python3-qrcode,
+         python3-serial,
+         python3-simplejson,
+         python3-six,
+         python3-usb,
+         python3-yaml,
+         ssl-cert
+Recommends: mkcert
+Homepage: https://github.com/superquinquin-sur-deule/debian-pywebdriver
+Description: Python Web Services to communicate with POS Devices
+ PyWebDriver provides local WebServices (based on Flask) to communicate
+ with POS hardware (printers, displays, scales, payment terminals) for Odoo.

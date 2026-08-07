@@ -1,0 +1,19 @@
+[Install]
+WantedBy=multi-user.target
+
+[Unit]
+Description=Pywebdriver
+After=network.target
+
+[Service]
+Restart=always
+RestartSec=5
+User=pywebdriver
+Group=ssl-cert
+ExecStart=/usr/bin/pywebdriverd
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
