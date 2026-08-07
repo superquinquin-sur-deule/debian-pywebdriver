@@ -1,0 +1,6 @@
+name: 'make pywebdriver.deb'
+description: 'Builds the pywebdriver debian package inside a trixie container'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

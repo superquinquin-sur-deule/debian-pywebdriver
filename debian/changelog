@@ -1,0 +1,7 @@
+pywebdriver (3.0.22-1~deb13u1) trixie; urgency=medium
+
+  * Initial Debian 13 (Trixie) packaging release.
+  * Update build dependencies and packaging rules for Python 3.11+ compliance.
+  * Ensure systemd service integration and local SSL certificate generation via mkcert.
+
+ -- Florent Jardin <florent@jardin.im>  Fri, 07 Aug 2026 22:50:00 +0200

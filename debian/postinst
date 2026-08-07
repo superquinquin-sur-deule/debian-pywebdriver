@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+USERNAME="pywebdriver"
+
+case "$1" in
+    configure)
+        echo "Configuring $USERNAME user and groups..."
+
+        if id -u "$USERNAME" >/dev/null 2>&1; then
+            echo "User '$USERNAME' already exists."
+        else
+            echo "Creating system user '$USERNAME'..."
+            adduser --quiet --system --no-create-home "$USERNAME"
+        fi
+
+        groupadd -f usbusers
+
+        for group in usbusers dialout ssl-cert; do
+            if getent group "$group" >/dev/null 2>&1; then
+                adduser --quiet "$USERNAME" "$group" 2>/dev/null || true
+            fi
+        done
+
+        if ! command -v mkcert >/dev/null 2>&1; then
+            echo "Skipping SSL certificate generation (mkcert not found)."
+        else
+            echo "Generating SSL certificates with mkcert..."
+            mkdir -p /etc/pywebdriver/cert
+
+            mkcert \
+                -cert-file /etc/pywebdriver/cert/cert.pem \
+                -key-file /etc/pywebdriver/cert/key.pem \
+                localhost 127.0.0.1 ::1
+
+            if [ -f /etc/pywebdriver/config.ini ]; then
+                sed -i -e 's+^;*\(sslcert=\).*+\1/etc/pywebdriver/cert/cert.pem+' \
+                       -e 's+^;*\(sslkey=\).*+\1/etc/pywebdriver/cert/key.pem+' \
+                       /etc/pywebdriver/config.ini
+            fi
+
+            chown -R "$USERNAME":nogroup /etc/pywebdriver
+        fi
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument '$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#

@@ -1,0 +1,24 @@
+name: Build pywebdriver for debian-trixie
+
+on:
+  push:
+    branches: ['**']
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: build package
+        uses: ./.github/build
+
+      - name: publish artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pywebdriver-debian13
+          path: "pkg/*.deb"
