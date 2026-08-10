@@ -2,7 +2,7 @@
 
 Package PyWebDriver for Debian 13 (Trixie)
 
-- <https://github.com/pywebdriver/pywebdriver.git>
+- <https://github.com/pywebdriver/pywebdriver.git> (patched to prevent crash on missing usb device)
 - <https://github.com/pywebdriver/py-xml-escpos> (patched for python3 compatibility)
 - <https://github.com/akretion/pypostelium>
 - <https://github.com/python-escpos/python-escpos>
