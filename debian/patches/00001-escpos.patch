@@ -1,0 +1,34 @@
+--- a/pywebdriver/plugins/escpos_driver.py
++++ b/pywebdriver/plugins/escpos_driver.py
+@@ -158,6 +158,13 @@
+                     kwargs["timeout"] = 0
+                     POSDriver.__init__(self, idVendor, idProduct, **kwargs)
+                     self.open_args.append(usb_args)  # First open_arg is usb_args
++                else:
++                    # No supported printer detected: keep the object in a
++                    # valid state so a later status query fails gracefully
++                    # (DeviceNotFoundError) instead of crashing on a missing
++                    # "usb_args" attribute. Impossible ids make find() return None.
++                    POSDriver.__init__(self, None, None)
++                    self.usb_args = {"idVendor": 0xFFFF, "idProduct": 0xFFFF}
+             elif device_type == "serial":
+                 kwargs["devfile"] = config.get("escpos_driver", "serial_device_name")
+                 kwargs["baudrate"] = config.getint("escpos_driver", "serial_baudrate")
+@@ -214,6 +221,17 @@
+                     connected.append(device)
+             return connected
+ 
++        @property
++        def device(self):
++            # python-escpos >= 3.0 made "device" a self-opening property:
++            # reading it before an explicit open() calls open() itself, which
++            # crashes on a missing usb_args when no printer is found. Opening
++            # is managed by open_printer(), so keep plain attribute access.
++            return self._device
++        @device.setter
++        def device(self, value):
++            self._device = value
++
+         def open_printer(self):
+             if self.device:
+                 return
