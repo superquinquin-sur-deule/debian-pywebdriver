@@ -1,0 +1,122 @@
+commit 612b29a795f68a101637ce28d0ce56c602f18b13
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:05:31 2026 +0200
+
+    escpos: python3 image processing
+
+diff --git a/xmlescpos/escpos.py b/xmlescpos/escpos.py
+index 0447059..a9d2748 100644
+--- a/xmlescpos/escpos.py
++++ b/xmlescpos/escpos.py
+@@ -5,7 +5,7 @@ import copy
+ import io
+ import base64
+ import math
+-import md5
++import hashlib
+ import re
+ import traceback
+ import xml.etree.ElementTree as ET
+@@ -306,9 +306,9 @@ class Escpos:
+         else:
+             image_border = 32 - (size % 32)
+             if (image_border % 2) == 0:
+-                return (image_border / 2, image_border / 2)
++                return (image_border // 2, image_border // 2)
+             else:
+-                return (image_border / 2, (image_border / 2) + 1)
++                return (image_border // 2, (image_border // 2) + 1)
+ 
+     def _print_image(self, line, size):
+         """ Print formatted image """
+@@ -318,8 +318,8 @@ class Escpos:
+ 
+        
+         self._raw(S_RASTER_N)
+-        buffer = "%02X%02X%02X%02X" % (((size[0]/size[1])/8), 0, size[1], 0)
+-        self._raw(buffer.decode('hex'))
++        buffer = "%02X%02X%02X%02X" % (((size[0]//size[1])//8), 0, size[1], 0)
++        self._raw(bytes.fromhex(buffer))
+         buffer = ""
+ 
+         while i < len(line):
+@@ -328,7 +328,7 @@ class Escpos:
+             i += 8
+             cont += 1
+             if cont % 4 == 0:
+-                self._raw(buffer.decode("hex"))
++                self._raw(bytes.fromhex(buffer))
+                 buffer = ""
+                 cont = 0
+ 
+@@ -337,7 +337,7 @@ class Escpos:
+         i = 0
+         cont = 0
+         buffer = ""
+-        raw = ""
++        raw = b""
+ 
+         def __raw(string):
+             if output:
+@@ -346,8 +346,8 @@ class Escpos:
+                 self._raw(string)
+        
+         raw += S_RASTER_N
+-        buffer = "%02X%02X%02X%02X" % (((size[0]/size[1])/8), 0, size[1], 0)
+-        raw += buffer.decode('hex')
++        buffer = "%02X%02X%02X%02X" % (((size[0]//size[1])//8), 0, size[1], 0)
++        raw += bytes.fromhex(buffer)
+         buffer = ""
+ 
+         while i < len(line):
+@@ -356,7 +356,7 @@ class Escpos:
+             i += 8
+             cont += 1
+             if cont % 4 == 0:
+-                raw += buffer.decode("hex")
++                raw += bytes.fromhex(buffer)
+                 buffer = ""
+                 cont = 0
+ 
+@@ -419,16 +419,16 @@ class Escpos:
+ 
+     def print_base64_image(self,img):
+ 
+-        print 'print_b64_img'
++        print('print_b64_img')
+ 
+-        id = md5.new(img).digest()
++        id = hashlib.md5(img.encode('utf-8')).digest()
+ 
+         if id not in self.img_cache:
+-            print 'not in cache'
++            print('not in cache')
+ 
+             img = img[img.find(',')+1:]
+-            f = io.BytesIO('img')
+-            f.write(base64.decodestring(img))
++            f = io.BytesIO()
++            f.write(base64.b64decode(img.encode('ascii')))
+             f.seek(0)
+             img_rgba = Image.open(f)
+             img = Image.new('RGB', img_rgba.size, (255,255,255))
+@@ -439,16 +439,16 @@ class Escpos:
+             else:
+                 img.paste(img_rgba)
+ 
+-            print 'convert image'
++            print('convert image')
+         
+             pix_line, img_size = self._convert_image(img)
+ 
+-            print 'print image'
++            print('print image')
+ 
+             buffer = self._raw_print_image(pix_line, img_size)
+             self.img_cache[id] = buffer
+ 
+-        print 'raw image'
++        print('raw image')
+ 
+         self._raw(self.img_cache[id])
+ 

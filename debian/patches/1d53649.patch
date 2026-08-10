@@ -1,0 +1,38 @@
+commit 1d5364913f457cf0a276e96f45498fe439fddb53
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:12:52 2026 +0200
+
+    fix: use relative imports
+
+diff --git a/xmlescpos/escpos.py b/xmlescpos/escpos.py
+index 6b8c45b..1a89bbe 100644
+--- a/xmlescpos/escpos.py
++++ b/xmlescpos/escpos.py
+@@ -23,8 +23,8 @@ try:
+ except ImportError:
+     qrcode = None
+ 
+-from constants import *
+-from exceptions import *
++from .constants import *
++from .exceptions import *
+ 
+ def utfstr(stuff):
+     """ converts stuff to string and does without failing if stuff is a utf8 string """
+diff --git a/xmlescpos/printer.py b/xmlescpos/printer.py
+index 66fc0f8..88dba6a 100644
+--- a/xmlescpos/printer.py
++++ b/xmlescpos/printer.py
+@@ -5,9 +5,9 @@ import usb.util
+ import serial
+ import socket
+ 
+-from escpos import *
+-from constants import *
+-from exceptions import *
++from .escpos import *
++from .constants import *
++from .exceptions import *
+ 
+ class Usb(Escpos):
+     """ Define USB printer """
