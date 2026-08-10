@@ -1,0 +1,74 @@
+commit 7ee84dc03342d5fa0c2d27f19abb09e47f160833
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:16:02 2026 +0200
+
+    feat: add Layout
+
+diff --git a/xmlescpos/__init__.py b/xmlescpos/__init__.py
+index 3fdedde..ff21f28 100644
+--- a/xmlescpos/__init__.py
++++ b/xmlescpos/__init__.py
+@@ -1 +1,3 @@
+ __all__ = ["constants","escpos","exceptions","printer","supported_devices"]
++
++from .escpos import Layout
+diff --git a/xmlescpos/escpos.py b/xmlescpos/escpos.py
+index 1a89bbe..742a17b 100644
+--- a/xmlescpos/escpos.py
++++ b/xmlescpos/escpos.py
+@@ -513,7 +513,7 @@ class Escpos:
+         else:
+             raise exception.BarcodeCodeError()
+ 
+-    def receipt(self,xml):
++    def receipt(self, xml, cut=True):
+         """
+         Prints an xml based receipt definition
+         """
+@@ -692,7 +692,7 @@ class Escpos:
+             if 'open-cashdrawer' in root.attrib and root.attrib['open-cashdrawer'] == 'true':
+                 self.cashdraw(2)
+                 self.cashdraw(5)
+-            if not 'cut' in root.attrib or root.attrib['cut'] == 'true' :
++            if cut and (not 'cut' in root.attrib or root.attrib['cut'] == 'true'):
+                 self.cut()
+ 
+         except Exception as e:
+@@ -906,3 +906,37 @@ class Escpos:
+             self._raw(CTL_HT)
+         elif ctl.upper() == "VT":
+             self._raw(CTL_VT)
++
++
++class _ReceiptBuffer(Escpos):
++    """ Escpos target that accumulates the rendered bytes in memory.
++
++    Used by :class:`Layout` to render a whole receipt to ESC/POS data
++    before sending it to a python-escpos printer object.
++    """
++
++    def __init__(self):
++        self.buffer = io.BytesIO()
++
++    def _raw(self, msg):
++        if isinstance(msg, str):
++            msg = msg.encode('latin-1')
++        self.buffer.write(msg)
++
++
++class Layout:
++    """ Render an xmlescpos XML receipt onto a python-escpos printer.
++
++    pywebdriver wraps its ESC/POS driver as a python-escpos printer object
++    and calls ``Layout(content).format(printer)``. The whole receipt is
++    rendered to ESC/POS bytes (styles, encodings, images, barcodes) and
++    pushed to the printer with a single ``printer._raw()`` call.
++    """
++
++    def __init__(self, content):
++        self.content = content
++
++    def format(self, printer):
++        renderer = _ReceiptBuffer()
++        renderer.receipt(self.content, cut=False)
++        printer._raw(renderer.buffer.getvalue())

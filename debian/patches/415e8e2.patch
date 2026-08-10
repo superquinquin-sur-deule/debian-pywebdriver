@@ -1,0 +1,13 @@
+commit 415e8e2500c1793aaa8badcf637ab6368ebf3b0f
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:08:31 2026 +0200
+
+    chore: ignore .venv
+
+diff --git a/xmlescpos/.gitignore b/xmlescpos/.gitignore
+index bee8a64..df6e22c 100644
+--- a/xmlescpos/.gitignore
++++ b/xmlescpos/.gitignore
+@@ -1 +1,2 @@
+ __pycache__
++.venv/
