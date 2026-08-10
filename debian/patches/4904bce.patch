@@ -1,0 +1,78 @@
+commit 4904bce9f043b8692da3c5b19c60ca24ee80b535
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:17:44 2026 +0200
+
+    test: package import and Layout
+
+diff --git a/xmlescpos/test_capture.py b/xmlescpos/test_capture.py
+index f033ffb..f72d112 100644
+--- a/xmlescpos/test_capture.py
++++ b/xmlescpos/test_capture.py
+@@ -1,12 +1,30 @@
+ #!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+-""" Smoke test : imprime un reçu XML + texte accentué + image base64
+-    sans matériel, en capturant les octets dans un BytesIO. """
++""" Smoke test pour le package `xmlescpos` :
++    - import du package tel qu'installé (imports relatifs) ;
++    - impression d'un reçu XML + texte accentué + image base64 ;
++    - `Layout(content).format(printer)` sur un vrai python-escpos
++      (Dummy), comme le fait pywebdriver.
++
++    Le chemin courant est retiré de sys.path pour que `escpos` résolve
++    vers le paquet python-escpos (site-packages) et pas le fichier plat
++    `escpos.py` du dépôt.
++"""
+ 
+ import io
++import os
++import sys
++
++_REPO_DIR = os.path.dirname(os.path.abspath(__file__))
++_PARENT_DIR = os.path.dirname(_REPO_DIR)
++
++sys.path = [p for p in sys.path if os.path.abspath(p) != _REPO_DIR]
++sys.path.insert(0, _PARENT_DIR)
+ 
+-from escpos import Escpos
++from xmlescpos import Layout
++from xmlescpos.escpos import Escpos
++from escpos.printer import Dummy
+ 
+ 
+ class CapturingPrinter(Escpos):
+@@ -44,7 +62,7 @@ RECEIPT_XML = """<receipt>
+     </receipt>""".format(png=PNG_1PX)
+ 
+ 
+-def main():
++def test_receipt_capture():
+     printer = CapturingPrinter()
+     printer.receipt(RECEIPT_XML)
+     printer.text("Accents: e-acute a-grave c-cedilla\n")
+@@ -52,8 +70,20 @@ def main():
+     printer.cut()
+     data = printer.buffer.getvalue()
+     assert isinstance(data, bytes) and len(data) > 0, "no bytes captured"
+-    print("OK: captured %d bytes" % len(data))
++    print("OK receipt: captured %d bytes" % len(data))
++
++
++def test_layout_dummy():
++    printer = Dummy()
++    Layout(RECEIPT_XML).format(printer)
++    rendered = printer._output_list
++    assert len(rendered) == 1, "expected a single raw blob, got %d" % len(rendered)
++    blob = rendered[0]
++    assert isinstance(blob, bytes) and len(blob) > 0, "no bytes rendered"
++    print("OK Layout: rendered %d bytes to python-escpos Dummy" % len(blob))
+ 
+ 
+ if __name__ == '__main__':
+-    main()
+\ No newline at end of file
++    test_receipt_capture()
++    test_layout_dummy()
++    print("all tests passed")
+\ No newline at end of file

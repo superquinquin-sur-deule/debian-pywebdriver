@@ -1,0 +1,94 @@
+commit 4db3b8814b57c5a87e5da747d18dfcd3a770bff9
+Author: Florent Jardin <florent@jardin.im>
+Date:   Sat Aug 8 13:05:40 2026 +0200
+
+    escpos: python3 text() pipeline
+
+diff --git a/xmlescpos/escpos.py b/xmlescpos/escpos.py
+index a9d2748..6b8c45b 100644
+--- a/xmlescpos/escpos.py
++++ b/xmlescpos/escpos.py
+@@ -681,7 +681,9 @@ class Escpos:
+         try:
+             stylestack      = StyleStack() 
+             serializer      = XmlSerializer(self)
+-            root            = ET.fromstring(xml.encode('utf-8'))
++            if isinstance(xml, bytes):
++                xml = xml.decode('utf-8')
++            root            = ET.fromstring(xml)
+ 
+             self._raw(stylestack.to_escpos())
+ 
+@@ -704,23 +706,18 @@ class Escpos:
+         """ Print Utf8 encoded alpha-numeric text """
+         if not txt:
+             return
+-        try:
+-            txt = txt.decode('utf-8')
+-        except:
+-            try:
+-                txt = txt.decode('utf-16')
+-            except:
+-                pass
++        if isinstance(txt, bytes):
++            txt = txt.decode('utf-8', 'replace')
+ 
+         self.extra_chars = 0
+         
+         def encode_char(char):  
+             """ 
+-            Encodes a single utf-8 character into a sequence of 
++            Encodes a single unicode character into a sequence of 
+             esc-pos code page change instructions and character declarations 
+             """ 
+             char_utf8 = char.encode('utf-8')
+-            encoded  = ''
++            encoded  = b''
+             encoding = self.encoding # we reuse the last encoding to prevent code page switches at every character
+             encodings = {
+                     # TODO use ordering to prevent useless switches
+@@ -756,7 +753,12 @@ class Escpos:
+                     if encoding == 'katakana': # Japanese characters
+                         if jcconv:
+                             # try to convert japanese text to a half-katakanas 
+-                            kata = jcconv.kata2half(jcconv.hira2kata(char_utf8))
++                            try:
++                                kata = jcconv.kata2half(jcconv.hira2kata(char_utf8))
++                            except Exception:
++                                kata = char_utf8
++                            if isinstance(kata, str):
++                                kata = kata.encode('utf-8')
+                             if kata != char_utf8:
+                                 self.extra_chars += len(kata.decode('utf-8')) - 1
+                                 # the conversion may result in multiple characters
+@@ -777,10 +779,10 @@ class Escpos:
+                     if encoding in remaining:
+                         del remaining[encoding]
+                     if len(remaining) >= 1:
+-                        encoding = remaining.items()[0][0]
++                        encoding = next(iter(remaining))
+                     else:
+                         encoding = 'cp437'
+-                        encoded  = '\xb1'    # could not encode, output error character
++                        encoded  = b'\xb1'    # could not encode, output error character
+                         break;
+ 
+             if encoding != self.encoding:
+@@ -792,7 +794,7 @@ class Escpos:
+             return encoded
+         
+         def encode_str(txt):
+-            buffer = ''
++            buffer = b''
+             for c in txt:
+                 buffer += encode_char(c)
+             return buffer
+@@ -803,7 +805,7 @@ class Escpos:
+         # remove double spaces to try to restore the original string length
+         # and prevent printing alignment issues
+         while self.extra_chars > 0: 
+-            dspace = txt.find('  ')
++            dspace = txt.find(b'  ')
+             if dspace > 0:
+                 txt = txt[:dspace] + txt[dspace+1:]
+                 self.extra_chars -= 1
