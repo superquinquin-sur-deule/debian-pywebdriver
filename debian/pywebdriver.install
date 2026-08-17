@@ -1,2 +1,3 @@
 debian/config.ini etc/pywebdriver
 escpos/capabilities.json usr/lib/python3/dist-packages/escpos
+debian/99-pywebdriver.rules usr/lib/udev/rules.d
