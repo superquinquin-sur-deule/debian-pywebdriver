@@ -34,8 +34,8 @@ case "$1" in
                 localhost 127.0.0.1 ::1
 
             if [ -f /etc/pywebdriver/config.ini ]; then
-                sed -i -e 's+^;*\(sslcert=\).*+\1/etc/pywebdriver/cert/cert.pem+' \
-                       -e 's+^;*\(sslkey=\).*+\1/etc/pywebdriver/cert/key.pem+' \
+                sed -i -e 's+^;*\(sslcert\).*+\1=/etc/pywebdriver/cert/cert.pem+' \
+                       -e 's+^;*\(sslkey\).*+\1=/etc/pywebdriver/cert/key.pem+' \
                        /etc/pywebdriver/config.ini
             fi
 
