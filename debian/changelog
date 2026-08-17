@@ -1,3 +1,11 @@
+pywebdriver (3.0.22-1~deb13u2) trixie; urgency=medium
+
+  * Ship udev rule granting pywebdriver access to USB printers and reload
+    udev rules on package configuration.
+  * Add Epson TM-T20IV (04b8:0e39) to supported ESC/POS printers.
+
+ -- Florent Jardin <florent@jardin.im>  Mon, 17 Aug 2026 14:30:00 +0200
+
 pywebdriver (3.0.22-1~deb13u1) trixie; urgency=medium
 
   * Initial Debian 13 (Trixie) packaging release.
