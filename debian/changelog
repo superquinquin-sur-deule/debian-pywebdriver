@@ -3,8 +3,12 @@ pywebdriver (3.0.22-1~deb13u2) trixie; urgency=medium
   * Ship udev rule granting pywebdriver access to USB printers and reload
     udev rules on package configuration.
   * Add Epson TM-T20IV (04b8:0e39) to supported ESC/POS printers.
+  * Fix receipt printing with Odoo 13+ which sends receipts as base64 JPEG
+    images: render them with the python-escpos image engine instead of the
+    bundled xmlescpos <img> path that rejected images taller than 255px and
+    crashed on 3-channel JPEGs.
 
- -- Florent Jardin <florent@jardin.im>  Mon, 17 Aug 2026 14:30:00 +0200
+ -- Florent Jardin <florent@jardin.im>  Mon, 17 Aug 2026 16:30:00 +0200
 
 pywebdriver (3.0.22-1~deb13u1) trixie; urgency=medium
 

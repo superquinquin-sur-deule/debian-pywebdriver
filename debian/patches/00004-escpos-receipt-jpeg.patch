@@ -1,0 +1,32 @@
+--- a/pywebdriver/plugins/escpos_driver.py
++++ b/pywebdriver/plugins/escpos_driver.py
+@@ -49,6 +49,19 @@ SUPPORTED_DEVICES = [
+ 
+ _logger = logging.getLogger(__name__)
+ 
++
++def _receipt_jpeg(b64image, printer):
++    import base64
++    from io import BytesIO
++
++    if "," in b64image:
++        b64image = b64image[b64image.find(",") + 1 :]
++    printer.open_printer()
++    printer.image(BytesIO(base64.b64decode(b64image)))
++    printer.cut()
++    printer.close()
++
++
+ try:  # noqa C901
+     if device_type == "serial":
+         from escpos.printer import Serial as POSDriver
+@@ -291,8 +304,7 @@ else:
+             }
+ 
+         def receipt_jpeg(self, b64image):
+-            content = '<img src="data:image/png;base64, {}" />'.format(b64image)
+-            self.receipt(content)
++            _receipt_jpeg(b64image, self)
+ 
+         def receipt(self, content):
+             self.open_printer()
