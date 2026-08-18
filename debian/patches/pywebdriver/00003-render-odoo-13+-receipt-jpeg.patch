@@ -1,6 +1,14 @@
+commit 72a25c1b41d182e40831efedb4aa6623800b47a1
+Author: Florent Jardin <florent@jardin.im>
+Date:   Tue Aug 18 09:09:23 2026 +0200
+
+    feat: render Odoo 13+ JPEG receipts with python-escpos
+
+diff --git a/pywebdriver/plugins/escpos_driver.py b/pywebdriver/plugins/escpos_driver.py
+index 706a9877..1cdf29ad 100644
 --- a/pywebdriver/plugins/escpos_driver.py
 +++ b/pywebdriver/plugins/escpos_driver.py
-@@ -49,6 +49,19 @@ SUPPORTED_DEVICES = [
+@@ -49,6 +49,19 @@
  
  _logger = logging.getLogger(__name__)
  
