@@ -1,0 +1,90 @@
+--- a/pywebdriver/plugins/escpos_driver_test.py
++++ a/pywebdriver/plugins/escpos_driver_test.py
+@@ -0,0 +1,87 @@
++"""Unit tests for the Odoo 13+ JPEG receipt rendering pipeline.
++
++pywebdriver.plugins.escpos_driver.receipt_jpeg() decodes the base64 JPEG
++receipt shipped by Odoo and renders it through python-escpos image().
++These tests exercise the exact same operations against a byte-capturing
++fake printer, and guard the two regressions of the former xmlescpos <img>
++path: a 3-channel JPEG crashed on channels[3], and any image taller than
++255px raised ImageSizeError.
++
++Run from the repo root:
++    PYTHONPATH=src python3 -m unittest discover -s tests -v
++"""
++
++import base64
++import io
++import unittest
++
++from PIL import Image
++
++from escpos.escpos import Escpos
++
++GS_V0 = b"\x1dv0"
++
++
++def _jpeg_receipt(width=60, height=400):
++    buf = io.BytesIO()
++    Image.new("RGB", (width, height), (255, 255, 255)).save(buf, "JPEG")
++    return base64.b64encode(buf.getvalue()).decode()
++
++
++def _decode_receipt(b64image):
++    if "," in b64image:
++        b64image = b64image[b64image.find(",") + 1 :]
++    return io.BytesIO(base64.b64decode(b64image))
++
++
++class FakePrinter(Escpos):
++    def __init__(self):
++        self.output = bytearray()
++        self.open_calls = 0
++        self.cut_calls = 0
++        self.close_calls = 0
++        super().__init__()
++
++    def _raw(self, data):
++        self.output += bytes(data)
++
++    def open_printer(self):
++        self.open_calls += 1
++
++    def cut(self, *args, **kwargs):
++        self.cut_calls += 1
++
++    def close(self):
++        self.close_calls += 1
++
++
++class ReceiptJpegTestCase(unittest.TestCase):
++    def _render(self, b64image):
++        printer = FakePrinter()
++        printer.open_printer()
++        printer.image(_decode_receipt(b64image))
++        printer.cut()
++        printer.close()
++        return printer
++
++    def test_renders_odoo18_rgb_jpeg(self):
++        printer = self._render(_jpeg_receipt())
++        self.assertTrue(printer.output.startswith(GS_V0))
++        self.assertGreater(len(printer.output), 4)
++        self.assertEqual(
++            (printer.open_calls, printer.cut_calls, printer.close_calls), (1, 1, 1)
++        )
++
++    def test_accepts_data_uri_prefix(self):
++        printer = self._render("data:image/jpeg;base64," + _jpeg_receipt())
++        self.assertTrue(printer.output.startswith(GS_V0))
++        self.assertGreater(len(printer.output), 4)
++
++    def test_receipt_taller_than_255px(self):
++        printer = self._render(_jpeg_receipt(height=512))
++        self.assertTrue(printer.output.startswith(GS_V0))
++        self.assertGreater(len(printer.output), 4)
++
++
++if __name__ == "__main__":
++    unittest.main()
