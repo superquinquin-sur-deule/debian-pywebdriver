@@ -19,5 +19,7 @@ Local test
 ```sh
 docker run --rm -it -v ./pkg:/pkg -w /pkg -p 8069:8069 debian:trixie-slim bash
 # apt update && apt install -y --no-install-recommends ./pywebdriver_*.deb usbutils
+# python3 -m xmlescpos.test_capture
+# python3 -m pywebdriver.plugins.escpos_driver_test
 # sed -i 's+^;*\(host=\).*+\10.0.0.0+' /etc/pywebdriver/config.ini && pywebdriverd
 ```
