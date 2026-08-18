@@ -1,3 +1,11 @@
+commit b9b134fed8d7e6ef994065e1cbce28160cbaac43
+Author: Florent Jardin <florent@jardin.im>
+Date:   Mon Aug 10 16:38:54 2026 +0200
+
+    fix: patch pywebdriver to prevent crash
+
+diff --git a/pywebdriver/plugins/escpos_driver.py b/pywebdriver/plugins/escpos_driver.py
+index b9a3d99f..f430a46a 100644
 --- a/pywebdriver/plugins/escpos_driver.py
 +++ b/pywebdriver/plugins/escpos_driver.py
 @@ -158,6 +158,13 @@
@@ -32,3 +40,16 @@
          def open_printer(self):
              if self.device:
                  return
+diff --git a/pywebdriver/views.py b/pywebdriver/views.py
+index 4f5ecf17..6e329003 100644
+--- a/pywebdriver/views.py
++++ b/pywebdriver/views.py
+@@ -48,6 +48,8 @@
+     str_devices = subprocess.getoutput("lsusb").split("\n")
+     devices = []
+     for device in str_devices:
++        if ": ID" not in device:
++            continue
+         devices.append(
+             {
+                 "bus": device.split(": ID ")[0].split(" ")[1],

@@ -20,8 +20,8 @@ index 0000000..f033ffb
 +#!/usr/bin/env python3
 +# -*- coding: utf-8 -*-
 +
-+""" Smoke test : imprime un reçu XML + texte accentué + image base64
-+    sans matériel, en capturant les octets dans un BytesIO. """
++""" Smoke test: print an XML receipt, accented text and a base64 image,
++    capturing the bytes into a BytesIO without any printer hardware. """
 +
 +import io
 +
@@ -29,7 +29,7 @@ index 0000000..f033ffb
 +
 +
 +class CapturingPrinter(Escpos):
-+    """ Sous-classe qui capture les octets au lieu d'envoyer à une imprimante """
++    """ Escpos subclass that captures bytes instead of sending them to a printer. """
 +
 +    def __init__(self):
 +        self.buffer = io.BytesIO()
@@ -40,24 +40,24 @@ index 0000000..f033ffb
 +        self.buffer.write(msg)
 +
 +
-+# petit PNG 1x1 (un pixel transparent) encodé en base64
++# tiny 1x1 PNG (one transparent pixel) in base64
 +PNG_1PX = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
 +
 +RECEIPT_XML = """<receipt>
-+      <h1>Mon magasin</h1>
-+      <p>Bonjour, total: <value>12.50</value></p>
-+      <line><left>Article</left><right>5.99 EUR</right></line>
-+      <line ratio="0.3"><left>Remise</left><right>-1.00</right></line>
++      <h1>My shop</h1>
++      <p>Hello, total: <value>12.50</value></p>
++      <line><left>Item</left><right>5.99 EUR</right></line>
++      <line ratio="0.3"><left>Discount</left><right>-1.00</right></line>
 +      <ul>
-+        <li>un</li>
-+        <li>deux</li>
++        <li>one</li>
++        <li>two</li>
 +      </ul>
 +      <ol>
-+        <li>premier</li>
++        <li>first</li>
 +        <li>second</li>
 +      </ol>
 +      <hr/>
-+      <em>accentue</em> <b>gras</b>
++      <em>déjà</em> <b>bold</b>
 +      <img src="data:image/png;base64,{png}"/>
 +      <br/>
 +    </receipt>""".format(png=PNG_1PX)

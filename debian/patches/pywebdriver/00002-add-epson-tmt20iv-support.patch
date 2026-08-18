@@ -1,3 +1,11 @@
+commit 72bffe75e270d7bdaa1e409629dccc86ee0de65f
+Author: Florent Jardin <florent@jardin.im>
+Date:   Mon Aug 17 15:08:00 2026 +0200
+
+    fix: add Epson TM-T20IV to supported ESC/POS printers
+
+diff --git a/pywebdriver/plugins/escpos_driver.py b/pywebdriver/plugins/escpos_driver.py
+index f430a46a..706a9877 100644
 --- a/pywebdriver/plugins/escpos_driver.py
 +++ b/pywebdriver/plugins/escpos_driver.py
 @@ -46,2 +46,3 @@

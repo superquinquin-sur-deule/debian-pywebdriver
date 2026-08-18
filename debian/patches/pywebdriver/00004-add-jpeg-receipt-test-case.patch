@@ -1,5 +1,14 @@
---- a/pywebdriver/plugins/escpos_driver_test.py
-+++ a/pywebdriver/plugins/escpos_driver_test.py
+commit 7419708cfe67bdd18f0a792ab1e16a0bb3e29612
+Author: Florent Jardin <florent@jardin.im>
+Date:   Tue Aug 18 09:24:48 2026 +0200
+
+    test: add jpeg receipt test case
+
+diff --git a/pywebdriver/plugins/escpos_driver_test.py b/pywebdriver/plugins/escpos_driver_test.py
+new file mode 100644
+index 0000000..82791e68
+--- /dev/null
++++ b/pywebdriver/plugins/escpos_driver_test.py
 @@ -0,0 +1,87 @@
 +"""Unit tests for the Odoo 13+ JPEG receipt rendering pipeline.
 +

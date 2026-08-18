@@ -8,21 +8,20 @@ diff --git a/xmlescpos/test_capture.py b/xmlescpos/test_capture.py
 index f033ffb..f72d112 100644
 --- a/xmlescpos/test_capture.py
 +++ b/xmlescpos/test_capture.py
-@@ -1,12 +1,30 @@
+@@ -1,12 +1,29 @@
  #!/usr/bin/env python3
  # -*- coding: utf-8 -*-
  
--""" Smoke test : imprime un reçu XML + texte accentué + image base64
--    sans matériel, en capturant les octets dans un BytesIO. """
-+""" Smoke test pour le package `xmlescpos` :
-+    - import du package tel qu'installé (imports relatifs) ;
-+    - impression d'un reçu XML + texte accentué + image base64 ;
-+    - `Layout(content).format(printer)` sur un vrai python-escpos
-+      (Dummy), comme le fait pywebdriver.
+-""" Smoke test: print an XML receipt, accented text and a base64 image,
+-    capturing the bytes into a BytesIO without any printer hardware. """
++""" Smoke test for the package `xmlescpos`:
++    - import the installed package (relative imports);
++    - print an XML receipt with accented text and a base64 image;
++    - `Layout(content).format(printer)` into a real python-escpos
++      `Dummy`, exactly as pywebdriver does;
 +
-+    Le chemin courant est retiré de sys.path pour que `escpos` résolve
-+    vers le paquet python-escpos (site-packages) et pas le fichier plat
-+    `escpos.py` du dépôt.
++    Drop the repo dir from `sys.path` so `escpos` resolves to the
++    python-escpos package (site-packages), not the flat `escpos.py`.
 +"""
  
  import io
