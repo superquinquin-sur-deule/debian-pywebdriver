@@ -2,7 +2,7 @@
 
 Package PyWebDriver for Debian 13 (Trixie)
 
-- <https://github.com/pywebdriver/pywebdriver.git> (patched to prevent crash on missing usb device)
+- <https://github.com/pywebdriver/pywebdriver.git> (patched to prevent crash on missing usb device and support jpeg receipt with odoo v13+)
 - <https://github.com/pywebdriver/py-xml-escpos> (patched for python3 compatibility)
 - <https://github.com/akretion/pypostelium>
 - <https://github.com/python-escpos/python-escpos>
@@ -11,7 +11,7 @@ Local build
 
 ```sh
 docker build -t pywebdriver-builder .github/build
-docker run --rm --user (id -u):(id -g) -v .:/build pywebdriver-builder make
+docker run --rm --user (id -u):(id -g) -v .:/build pywebdriver-builder
 ```
 
 Local test
